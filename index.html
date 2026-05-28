@@ -2033,12 +2033,13 @@ THREE.OrbitControls = OrbitControls;
         const vRms = Math.sqrt(3) * sigmaColor;
         const vLo = 0.09 * vRms;
         const vHi = elInsulated.checked ? 2.42 * vRms : 2.85 * vRms;
+        const vColorHi = 1.8 * vRms;
         let keSum = 0;
         for (let i = 0; i < N; i++) {
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
-          const tn = THREE.MathUtils.clamp((sp - vLo) / (vHi - vLo), 0, 1);
-          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.45 + 0.50 * tn);
+          const tn = THREE.MathUtils.clamp((sp - vLo) / (vColorHi - vLo), 0, 1);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.72 + 0.26 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
