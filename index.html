@@ -1706,7 +1706,7 @@ THREE.OrbitControls = OrbitControls;
       }
       if (fMax < 1e-10) fMax = 1e-10;
 
-      const padL = 46, padR = 14, padB = 28, padT = 20;
+      const padL = 72, padR = 14, padB = 28, padT = 20;
       const plotW = wCss - padL - padR;
       const plotH = hCss - padT - padB;
 
@@ -1758,14 +1758,10 @@ THREE.OrbitControls = OrbitControls;
       ctx.fillText("0", padL - 2, hCss - 6);
       ctx.textAlign = "right";
       ctx.fillText(vmax.toFixed(2), padL + plotW + 2, hCss - 6);
-      ctx.textAlign = "right";
-      ctx.fillText("f_max≈" + fMax.toFixed(3), padL - 6, padT + 10);
-      ctx.save();
-      ctx.translate(14, padT + plotH * 0.52);
-      ctx.rotate(-Math.PI / 2);
-      ctx.textAlign = "center";
-      ctx.fillText("概率密度 f", 0, 0);
-      ctx.restore();
+      ctx.textAlign = "left";
+      ctx.fillText("f_max≈" + fMax.toFixed(3), 4, padT + 4);
+      ctx.textAlign = "left";
+      ctx.fillText("概率密度 f", 4, padT + plotH * 0.5);
       ctx.textAlign = "left";
     }
 
