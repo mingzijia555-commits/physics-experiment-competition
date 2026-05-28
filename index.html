@@ -48,7 +48,7 @@
     }
     .mini-legend-bar-inline {
       display: inline-block; width: 150px; height: 10px; border-radius: 5px;
-      background: linear-gradient(90deg, #3388ff, #00ddcc, #44ee55, #ffdd33, #ff3333);
+      background: linear-gradient(90deg, #1155dd, #00ccbb, #44dd44, #ffcc22, #ff2222);
       vertical-align: middle;
     }
     button {
@@ -1791,7 +1791,7 @@ THREE.OrbitControls = OrbitControls;
       dir.position.set(4, 6, 5);
       scene.add(dir);
 
-      const boxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
+      const boxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 });
       function buildBoxLines(x0, x1) {
         const h = BOX.y, d = BOX.z;
         const pts = [
@@ -1815,7 +1815,7 @@ THREE.OrbitControls = OrbitControls;
       scene.add(pistonMesh);
 
       const sphereGeo = new THREE.SphereGeometry(R, 8, 8);
-      const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.06, roughness: 0.38 });
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const inst = new THREE.InstancedMesh(sphereGeo, sphereMat, N);
       const icBuf = new Float32Array(N * 3);
       icBuf.fill(1);
@@ -2039,7 +2039,7 @@ THREE.OrbitControls = OrbitControls;
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
           const tn = THREE.MathUtils.clamp((sp - vLo) / (vColorHi - vLo), 0, 1);
-          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.72 + 0.26 * tn);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.22 + 0.50 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
