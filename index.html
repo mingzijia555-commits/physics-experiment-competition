@@ -1787,8 +1787,8 @@ THREE.OrbitControls = OrbitControls;
       controls.target.set(0, 0, 0);
       controls.enableDamping = true;
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-      const dir = new THREE.DirectionalLight(0xffffff, 0.75);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.90);
       dir.position.set(4, 6, 5);
       scene.add(dir);
 
@@ -1816,7 +1816,7 @@ THREE.OrbitControls = OrbitControls;
       scene.add(pistonMesh);
 
       const sphereGeo = new THREE.SphereGeometry(R, 8, 8);
-      const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.0, roughness: 0.22 });
+      const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.0, roughness: 0.18 });
       const inst = new THREE.InstancedMesh(sphereGeo, sphereMat, N);
       const icBuf = new Float32Array(N * 3);
       icBuf.fill(1);
@@ -2038,7 +2038,7 @@ THREE.OrbitControls = OrbitControls;
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
           const tn = THREE.MathUtils.clamp(sp / V_COLOR_ABS_MAX, 0, 1);
-          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.35 + 0.28 * tn);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.32 + 0.28 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
