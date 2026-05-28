@@ -31,7 +31,7 @@
     .chamber-hd.b { color: #ffa657; }
     .chamber-ctl {
       flex: 0 0 auto; padding: 12px 14px; font-size: 14px; line-height: 1.6;
-      max-height: 28vh; overflow-y: auto; border-bottom: 1px solid #21262d;
+      border-bottom: 1px solid #21262d;
     }
     .chamber-ctl input[type="range"] { width: 100%; height: 20px; }
     .chamber-ctl input:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -57,10 +57,10 @@
     }
     button:hover { background: #30363d; transform: translateY(-1px); }
     button:active { transform: translateY(0); }
-    button.primary { background: #238636; border-color: #238636; }
+    button.primary { background: #238636; border-color: #2ea043; color: #fff; }
     button.primary:hover { background: #2ea043; }
-    button.warn { border-color: #f0883e; color: #ffa657; }
-    button.ghost { border-color: #484f58; color: #c9d1d9; }
+    button.danger { background: #b62324; border-color: #da3633; color: #fff; }
+    button.danger:hover { background: #da3633; }
     .stat { font-variant-numeric: tabular-nums; color: #79c0ff; font-weight: 500; }
     .hint-top { font-size: 13px; color: #8b949e; max-width: 1000px; line-height: 1.6; }
     #load-fail-msg {
@@ -101,8 +101,8 @@
       </div>
       <div class="row-inline">
         <button type="button" class="primary" id="btnSyncInit">同步初始条件</button>
-        <button type="button" class="ghost" id="btnCompressBoth">两侧同时压缩</button>
-        <button type="button" class="ghost" id="btnExpandBoth">两侧同时膨胀</button>
+        <button type="button" id="btnCompressBoth">两侧同时压缩</button>
+        <button type="button" id="btnExpandBoth">两侧同时膨胀</button>
         <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
           <input type="checkbox" id="linkPiston" />
           联动活塞
@@ -123,7 +123,7 @@
           <input type="range" id="piston-a" min="0" max="100" value="100" />
           <div style="margin-top:8px;">
             <button type="button" class="primary" id="btnCompress-a">压缩</button>
-            <button type="button" class="warn" id="btnExpand-a">膨胀</button>
+            <button type="button" class="danger" id="btnExpand-a">膨胀</button>
           </div>
           <div style="margin-top:10px;">容积: <span id="vol-a" class="stat">—</span></div>
           <div>⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span></div>
@@ -144,7 +144,7 @@
           <input type="range" id="piston-b" min="0" max="100" value="100" />
           <div style="margin-top:8px;">
             <button type="button" class="primary" id="btnCompress-b">压缩</button>
-            <button type="button" class="warn" id="btnExpand-b">膨胀</button>
+            <button type="button" class="danger" id="btnExpand-b">膨胀</button>
           </div>
           <div style="margin-top:10px;">容积: <span id="vol-b" class="stat">—</span></div>
           <div>⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span></div>
