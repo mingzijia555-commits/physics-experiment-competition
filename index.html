@@ -1612,6 +1612,7 @@ THREE.OrbitControls = OrbitControls;
     /** 单原子理想气体绝热过程：TV^(γ-1)=const，γ=5/3，γ-1=2/3 */
     const ADIABAT_GAMMA = 5 / 3;
     const ADIABAT_VOLUME_EXP = ADIABAT_GAMMA - 1; // = 2/3 ≈ 0.6667
+    const V_COLOR_ABS_MAX = 2.0 * Math.sqrt(3) * SIGMA_AT_REF * Math.sqrt(2000 / T_REF_K); // ≈3.93, 颜色映射的绝对速率上界
 
     const elTemp = document.getElementById("temp");
     const elTempVal = document.getElementById("tempVal");
@@ -1786,12 +1787,12 @@ THREE.OrbitControls = OrbitControls;
       controls.target.set(0, 0, 0);
       controls.enableDamping = true;
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-      const dir = new THREE.DirectionalLight(0xffffff, 0.85);
+      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.75);
       dir.position.set(4, 6, 5);
       scene.add(dir);
 
-      const boxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 });
+      const boxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.30 });
       function buildBoxLines(x0, x1) {
         const h = BOX.y, d = BOX.z;
         const pts = [
@@ -1815,7 +1816,7 @@ THREE.OrbitControls = OrbitControls;
       scene.add(pistonMesh);
 
       const sphereGeo = new THREE.SphereGeometry(R, 8, 8);
-      const sphereMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const sphereMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.0, roughness: 0.22 });
       const inst = new THREE.InstancedMesh(sphereGeo, sphereMat, N);
       const icBuf = new Float32Array(N * 3);
       icBuf.fill(1);
@@ -2031,15 +2032,13 @@ THREE.OrbitControls = OrbitControls;
           sigmaColor = sigmaFromTempK(readTempK());
         }
         const vRms = Math.sqrt(3) * sigmaColor;
-        const vLo = 0.09 * vRms;
         const vHi = elInsulated.checked ? 2.42 * vRms : 2.85 * vRms;
-        const vColorHi = 1.8 * vRms;
         let keSum = 0;
         for (let i = 0; i < N; i++) {
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
-          const tn = THREE.MathUtils.clamp((sp - vLo) / (vColorHi - vLo), 0, 1);
-          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.22 + 0.50 * tn);
+          const tn = THREE.MathUtils.clamp(sp / V_COLOR_ABS_MAX, 0, 1);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.35 + 0.28 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
