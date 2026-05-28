@@ -6,17 +6,17 @@
   <title>3D 分子热运动 — 双容器隔热对比</title>
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #0d1117; color: #e6edf3; }
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #0d1117; color: #e6edf3; font-size: 14px; }
     #app-root { height: 100%; display: flex; flex-direction: column; }
     #top-bar {
-      flex: 0 0 auto; padding: 8px 12px; z-index: 20;
+      flex: 0 0 auto; padding: 12px 16px; z-index: 20;
       background: rgba(22, 27, 34, 0.96); border-bottom: 1px solid #30363d;
-      display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font-size: 12px;
+      display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-size: 14px;
     }
-    #top-bar h1 { margin: 0; font-size: 14px; font-weight: 600; color: #58a6ff; width: 100%; }
-    #top-bar label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-    #top-bar input[type="range"] { width: 140px; vertical-align: middle; }
-    .row-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #top-bar h1 { margin: 0; font-size: 18px; font-weight: 600; color: #58a6ff; width: 100%; }
+    #top-bar label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    #top-bar input[type="range"] { width: 160px; vertical-align: middle; }
+    .row-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     #twin { flex: 1; display: flex; min-height: 0; }
     .chamber {
       flex: 1; display: flex; flex-direction: column; min-width: 0;
@@ -24,47 +24,52 @@
     }
     .chamber:last-child { border-right: none; }
     .chamber-hd {
-      flex: 0 0 auto; padding: 6px 10px; font-weight: 600; font-size: 13px;
+      flex: 0 0 auto; padding: 10px 14px; font-weight: 600; font-size: 16px;
       background: rgba(30, 36, 44, 0.9); border-bottom: 1px solid #30363d;
     }
     .chamber-hd.a { color: #79c0ff; }
     .chamber-hd.b { color: #ffa657; }
     .chamber-ctl {
-      flex: 0 0 auto; padding: 8px 10px; font-size: 12px; line-height: 1.45;
-      max-height: 32vh; overflow-y: auto; border-bottom: 1px solid #21262d;
+      flex: 0 0 auto; padding: 12px 14px; font-size: 14px; line-height: 1.6;
+      max-height: 28vh; overflow-y: auto; border-bottom: 1px solid #21262d;
     }
-    .chamber-ctl input[type="range"] { width: 100%; }
+    .chamber-ctl input[type="range"] { width: 100%; height: 20px; }
     .chamber-ctl input:disabled { opacity: 0.45; cursor: not-allowed; }
-    .canvas-3d { flex: 1; min-height: 100px; position: relative; }
+    .canvas-3d { flex: 1; min-height: 120px; position: relative; }
     .canvas-3d canvas { display: block; width: 100%; height: 100%; }
     .hist-wrap {
-      flex: 0 0 auto; padding: 6px 8px 8px; background: #161b22;
+      flex: 0 0 auto; padding: 10px 12px 12px; background: #161b22;
       border-top: 1px solid #30363d;
     }
-    .hist-title { font-size: 11px; color: #8b949e; margin-bottom: 4px; }
-    .hist-wrap canvas { width: 100%; height: 110px; display: block; background: #0d1117; border-radius: 4px; }
+    .hist-title { font-size: 13px; color: #8b949e; margin-bottom: 6px; }
+    .hist-wrap canvas { width: 100%; height: 140px; display: block; background: #0d1117; border-radius: 6px; }
     .mini-legend {
-      display: flex; align-items: center; gap: 6px; margin-top: 6px; font-size: 10px; color: #8b949e;
+      display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: #8b949e;
     }
     .mini-legend-bar {
-      flex: 1; height: 6px; border-radius: 3px;
+      flex: 1; height: 8px; border-radius: 4px;
       background: linear-gradient(90deg, #339af0, #ffe066, #ff6b6b);
     }
     button {
-      margin-top: 4px; margin-right: 6px; padding: 6px 12px; border-radius: 6px;
-      border: 1px solid #388bfd; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 12px;
+      margin-top: 6px; margin-right: 8px; padding: 8px 16px; border-radius: 8px;
+      border: 1px solid #388bfd; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 14px;
+      transition: background 0.2s, transform 0.1s;
     }
-    button:hover { background: #30363d; }
+    button:hover { background: #30363d; transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
     button.primary { background: #238636; border-color: #238636; }
+    button.primary:hover { background: #2ea043; }
     button.warn { border-color: #f0883e; color: #ffa657; }
     button.ghost { border-color: #484f58; color: #c9d1d9; }
-    .stat { font-variant-numeric: tabular-nums; color: #79c0ff; }
-    .hint-top { font-size: 11px; color: #8b949e; max-width: 900px; line-height: 1.45; }
+    .stat { font-variant-numeric: tabular-nums; color: #79c0ff; font-weight: 500; }
+    .hint-top { font-size: 13px; color: #8b949e; max-width: 1000px; line-height: 1.6; }
     #load-fail-msg {
-      display: none; position: fixed; bottom: 12px; left: 12px; right: 12px; z-index: 99;
-      max-width: 560px; margin: 0 auto; padding: 12px 14px; border-radius: 8px;
-      background: #21262d; border: 1px solid #f85149; color: #fff; font-size: 13px; line-height: 1.55;
+      display: none; position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 99;
+      max-width: 600px; margin: 0 auto; padding: 16px 20px; border-radius: 10px;
+      background: #21262d; border: 1px solid #f85149; color: #fff; font-size: 15px; line-height: 1.6;
     }
+    .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .checkbox-label input[type="checkbox"] { width: 16px; height: 16px; }
   </style>
   <script>
     window.addEventListener("unhandledrejection", function () {
@@ -84,68 +89,72 @@
 </head>
 <body>
   <div id="load-fail-msg">
-    <strong>3D 未启动</strong>：本页已内联 Three.js，理论上<strong>仅需本 HTML 文件</strong>即可。请用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开；若显卡/驱动禁用 WebGL 仍会黑屏。也可运行 <code>打开演示.bat</code> 经本地 HTTP 访问。
+    <strong>3D 未启动</strong>：请用 <strong>Chrome</strong> 或 <strong>Edge</strong> 打开本文件。若显卡/驱动禁用 WebGL 仍会黑屏。
   </div>
 
   <div id="app-root">
     <div id="top-bar">
-      <h1>双容器对比：隔热 / 非隔热 + 活塞压缩（麦克斯韦速率分布）</h1>
+      <h1>分子热运动仿真：双容器隔热对比实验（麦克斯韦速率分布）</h1>
       <div class="row-inline">
-        <span>气体温度 <span id="tempVal" class="stat">300</span> K</span>
+        <span>热浴温度 <span id="tempVal" class="stat">300</span> K</span>
         <input type="range" id="temp" min="80" max="900" step="5" value="300" />
       </div>
       <div class="row-inline">
         <button type="button" class="primary" id="btnSyncInit">同步初始条件</button>
         <button type="button" class="ghost" id="btnCompressBoth">两侧同时压缩</button>
         <button type="button" class="ghost" id="btnExpandBoth">两侧同时膨胀</button>
-        <label title="只保留左侧活塞滑块，右侧与左侧一致">
+        <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
           <input type="checkbox" id="linkPiston" />
           联动活塞
         </label>
       </div>
       <p class="hint-top">
-        先点<strong>同步初始条件</strong>：两罐分子位置与速度完全相同、活塞同开度、同一统计基准。再分别勾选隔热、推动活塞或点「两侧同时压缩」对比。
-        温度滑块会同时改变两侧热浴目标（非隔热）或对两侧重抽麦克斯韦速度。
-        <strong>打开方式</strong>：可直接双击 <code>index.html</code>（须与 <code>vendor</code> 文件夹同目录，推荐 Chrome / Edge）。<strong>提示</strong>：下方 f(|v|) 图横轴为<strong>速率</strong>、纵轴为<strong>概率密度</strong>；横轴上界在「同步初态」时按初态与<strong>最大压缩绝热</strong>及高温热浴包络<strong>固定</strong>，绝热压缩后峰位会<strong>右移</strong>。分子数已增至 168、容器略放大以利统计与观感。<strong>隔热</strong>：碰撞 + 麦克斯韦混合，⟨E<sub>k</sub>⟩ 随容积按绝热趋势升高（指数略大于 2/3 便于观察）。<strong>非隔热</strong>：与滑块温度 <i>T</i> 热浴弛豫至麦克斯韦并定标 ⟨E<sub>k</sub>⟩。
+        <strong>使用方法</strong>：点击「同步初始条件」使两侧分子状态相同，再分别设置隔热/非隔热、调整活塞位置进行对比实验。
+        <br><strong>物理模型</strong>：隔热时系统经历绝热过程 ⟨E<sub>k</sub>⟩ ∝ V<sup>-(γ-1)</sup>（γ=5/3）；非隔热时与热浴平衡至麦克斯韦分布。
+        <br><strong>图表说明</strong>：下方 f(|v|) 图横轴为速率 |v|，纵轴为概率密度；绝热压缩后峰位右移（温度升高）。
       </p>
     </div>
     <div id="twin">
       <section class="chamber" id="chamber-a">
         <div class="chamber-hd a">容器 A</div>
         <div class="chamber-ctl">
-          <label><input type="checkbox" id="insulated-a" checked /> 隔热（不向环境散热）</label>
-          <div style="margin-top:6px">活塞位置</div>
+          <label class="checkbox-label"><input type="checkbox" id="insulated-a" checked /> 隔热（绝热过程）</label>
+          <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
           <input type="range" id="piston-a" min="0" max="100" value="100" />
-          <div>
+          <div style="margin-top:8px;">
             <button type="button" class="primary" id="btnCompress-a">压缩</button>
             <button type="button" class="warn" id="btnExpand-a">膨胀</button>
           </div>
-          <div>容积: <span id="vol-a" class="stat">—</span>　⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span>　相对初态: <span id="keRel-a" class="stat">—</span></div>
+          <div style="margin-top:10px;">容积: <span id="vol-a" class="stat">—</span></div>
+          <div>⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span></div>
+          <div>相对初态: <span id="keRel-a" class="stat">—</span></div>
           <div class="mini-legend"><span>慢</span><div class="mini-legend-bar"></div><span>快</span></div>
         </div>
         <div id="canvas-wrap-a" class="canvas-3d"></div>
         <div class="hist-wrap">
           <div class="hist-title">容器 A：|v| 概率密度 f(|v|)（横轴固定上界，压缩后峰右移）</div>
-          <canvas id="hist-a" width="400" height="110"></canvas>
+          <canvas id="hist-a" width="400" height="140"></canvas>
         </div>
       </section>
       <section class="chamber" id="chamber-b">
         <div class="chamber-hd b">容器 B</div>
         <div class="chamber-ctl">
-          <label><input type="checkbox" id="insulated-b" /> 隔热（不向环境散热）</label>
-          <div style="margin-top:6px">活塞位置</div>
+          <label class="checkbox-label"><input type="checkbox" id="insulated-b" /> 隔热（绝热过程）</label>
+          <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
           <input type="range" id="piston-b" min="0" max="100" value="100" />
-          <div>
+          <div style="margin-top:8px;">
             <button type="button" class="primary" id="btnCompress-b">压缩</button>
             <button type="button" class="warn" id="btnExpand-b">膨胀</button>
           </div>
-          <div>容积: <span id="vol-b" class="stat">—</span>　⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span>　相对初态: <span id="keRel-b" class="stat">—</span></div>
+          <div style="margin-top:10px;">容积: <span id="vol-b" class="stat">—</span></div>
+          <div>⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span></div>
+          <div>相对初态: <span id="keRel-b" class="stat">—</span></div>
           <div class="mini-legend"><span>慢</span><div class="mini-legend-bar"></div><span>快</span></div>
         </div>
         <div id="canvas-wrap-b" class="canvas-3d"></div>
         <div class="hist-wrap">
           <div class="hist-title">容器 B：|v| 概率密度 f(|v|)（横轴固定上界，压缩后峰右移）</div>
-          <canvas id="hist-b" width="400" height="110"></canvas>
+          <canvas id="hist-b" width="400" height="140"></canvas>
         </div>
       </section>
     </div>
@@ -1594,9 +1603,9 @@ THREE.OrbitControls = OrbitControls;
     const xMin = -1.35;
     const T_REF_K = 300;
     const SIGMA_AT_REF = 0.44;
-    /** 单原子理论为 ⟨Ek⟩∝(V₀/V)^(γ−1)，γ−1=2/3；略增大指数便于课堂观察压缩升温 */
+    /** 单原子理想气体绝热过程：TV^(γ-1)=const，γ=5/3，γ-1=2/3 */
     const ADIABAT_GAMMA = 5 / 3;
-    const ADIABAT_VOLUME_EXP = 0.82;
+    const ADIABAT_VOLUME_EXP = ADIABAT_GAMMA - 1; // = 2/3 ≈ 0.6667
 
     const elTemp = document.getElementById("temp");
     const elTempVal = document.getElementById("tempVal");
@@ -1647,7 +1656,7 @@ THREE.OrbitControls = OrbitControls;
     function drawSpeedDensityLine(canvas, vel, vmaxAxisFixed) {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const wCss = canvas.clientWidth || 400;
-      const hCss = 110;
+      const hCss = 140;
       if (canvas.width !== Math.floor(wCss * dpr) || canvas.height !== Math.floor(hCss * dpr)) {
         canvas.width = Math.floor(wCss * dpr);
         canvas.height = Math.floor(hCss * dpr);
@@ -1728,7 +1737,7 @@ THREE.OrbitControls = OrbitControls;
       ctx.stroke();
 
       ctx.fillStyle = "#8b949e";
-      ctx.font = "10px Segoe UI, PingFang SC, sans-serif";
+      ctx.font = "12px Segoe UI, PingFang SC, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("速率 |v|", padL + plotW * 0.5, hCss - 4);
       ctx.textAlign = "left";
