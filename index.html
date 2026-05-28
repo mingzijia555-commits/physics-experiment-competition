@@ -101,8 +101,8 @@
       </div>
       <div class="row-inline">
         <button type="button" class="primary" id="btnSyncInit">同步初始条件</button>
-        <button type="button" id="btnCompressBoth">两侧同时压缩</button>
-        <button type="button" id="btnExpandBoth">两侧同时膨胀</button>
+        <button type="button" class="primary" id="btnCompressBoth">两侧同时压缩</button>
+        <button type="button" class="primary" id="btnExpandBoth">两侧同时膨胀</button>
         <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
           <input type="checkbox" id="linkPiston" />
           联动活塞
@@ -1804,12 +1804,12 @@ THREE.OrbitControls = OrbitControls;
 
       const pistonGeo = new THREE.PlaneGeometry(BOX.y * 2, BOX.z * 2);
       const pistonMat = new THREE.MeshStandardMaterial({
-        color: 0x3fb950,
+        color: 0x58a6ff,
         side: THREE.DoubleSide,
-        metalness: 0.2,
-        roughness: 0.5,
+        metalness: 0.1,
+        roughness: 0.6,
         transparent: true,
-        opacity: 0.65,
+        opacity: 0.35,
       });
       const pistonMesh = new THREE.Mesh(pistonGeo, pistonMat);
       pistonMesh.rotation.y = Math.PI / 2;
@@ -2039,7 +2039,7 @@ THREE.OrbitControls = OrbitControls;
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
           const tn = THREE.MathUtils.clamp((sp - vLo) / (vHi - vLo), 0, 1);
-          colorTmp.setHSL(0.58 - tn * 0.58, 0.78, 0.42 + 0.18 * tn);
+          colorTmp.setHSL(0.6 - tn * 0.6, 0.9, 0.3 + 0.45 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
