@@ -9,13 +9,15 @@
     html, body { margin: 0; height: 100%; overflow: hidden; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #0d1117; color: #e6edf3; font-size: 14px; }
     #app-root { height: 100%; display: flex; flex-direction: column; }
     #top-bar {
-      flex: 0 0 auto; padding: 12px 16px; z-index: 20;
+      flex: 0 0 auto; padding: 12px 0; z-index: 20;
       background: rgba(22, 27, 34, 0.96); border-bottom: 1px solid #30363d;
-      display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-size: 14px;
+      display: flex; font-size: 14px;
     }
-    #top-bar h1 { margin: 0; font-size: 18px; font-weight: 600; color: #ffffff; width: 100%; }
+    #top-bar-left { flex: 1; max-width: 62%; padding: 0 20px; border-right: 1px solid #30363d; }
+    #top-bar-left h1 { margin: 0 0 6px 0; font-size: 18px; font-weight: 600; color: #ffffff; }
+    #top-bar-right { flex: 0 0 auto; padding: 0 32px 0 28px; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
     #top-bar label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    #top-bar input[type="range"] { width: 160px; vertical-align: middle; }
+    #top-bar input[type="range"] { width: 140px; vertical-align: middle; }
     .row-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     #twin { flex: 1; display: flex; min-height: 0; }
     .chamber {
@@ -95,24 +97,27 @@
 
   <div id="app-root">
     <div id="top-bar">
-      <h1>分子热运动仿真：双容器隔热对比实验（麦克斯韦速率分布）</h1>
-      <div class="row-inline">
-        <span>热浴温度 <span id="tempVal" class="stat">300</span> K</span>
-        <input type="range" id="temp" min="80" max="2000" step="5" value="300" />
+      <div id="top-bar-left">
+        <h1>分子热运动仿真：双容器隔热对比实验（麦克斯韦速率分布）</h1>
+        <p class="hint-top">
+          <strong>使用方法</strong>：点击「同步初始条件」使两侧分子状态相同，再分别设置隔热/非隔热、调整活塞位置进行对比实验。
+          <br><strong>物理模型</strong>：隔热时系统经历绝热过程 ⟨E<sub>k</sub>⟩ ∝ V<sup>-(γ-1)</sup>（γ=5/3）；非隔热时与热浴平衡至麦克斯韦分布。
+          <br><strong>图表说明</strong>：下方 f(|v|) 图横轴为速率 |v|，纵轴为概率密度；绝热压缩后峰位右移（温度升高）。
+          <br><strong>粒子颜色与速率对照图</strong>：<span class="mini-legend-inline"><span>慢</span><span class="mini-legend-bar-inline"></span><span>快</span></span>
+        </p>
       </div>
-      <div class="row-inline">
-        <button type="button" id="btnSyncInit">同步初始条件</button>
-        <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
-          <input type="checkbox" id="linkPiston" />
-          联动活塞
-        </label>
+      <div id="top-bar-right">
+        <div class="row-inline">
+          <span>初始热浴温度 <span id="tempVal" class="stat">300</span> K</span>
+          <input type="range" id="temp" min="80" max="2000" step="5" value="300" />
+        </div>
+        <div class="row-inline">
+          <button type="button" id="btnSyncInit">同步初始条件</button>
+          <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
+            <input type="checkbox" id="linkPiston" /> 联动活塞
+          </label>
+        </div>
       </div>
-      <p class="hint-top">
-        <strong>使用方法</strong>：点击「同步初始条件」使两侧分子状态相同，再分别设置隔热/非隔热、调整活塞位置进行对比实验。
-        <br><strong>物理模型</strong>：隔热时系统经历绝热过程 ⟨E<sub>k</sub>⟩ ∝ V<sup>-(γ-1)</sup>（γ=5/3）；非隔热时与热浴平衡至麦克斯韦分布。
-        <br><strong>图表说明</strong>：下方 f(|v|) 图横轴为速率 |v|，纵轴为概率密度；绝热压缩后峰位右移（温度升高）。
-        <br><strong>粒子颜色与速率对照图</strong>：<span class="mini-legend-inline"><span>慢</span><span class="mini-legend-bar-inline"></span><span>快</span></span>
-      </p>
     </div>
     <div id="twin">
       <section class="chamber" id="chamber-a">
@@ -120,6 +125,7 @@
           容器 A
           <span class="chamber-stats">
             容积: <span id="vol-a" class="stat">—</span> |
+            T: <span id="temp-a" class="stat">—</span> K |
             ⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span> |
             相对初态: <span id="keRel-a" class="stat">—</span>
           </span>
@@ -144,6 +150,7 @@
           容器 B
           <span class="chamber-stats">
             容积: <span id="vol-b" class="stat">—</span> |
+            T: <span id="temp-b" class="stat">—</span> K |
             ⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span> |
             相对初态: <span id="keRel-b" class="stat">—</span>
           </span>
@@ -1770,6 +1777,7 @@ THREE.OrbitControls = OrbitControls;
       const elKe = document.getElementById(`ke-${suffix}`);
       const elVol = document.getElementById(`vol-${suffix}`);
       const elKeRel = document.getElementById(`keRel-${suffix}`);
+      const elTempCh = document.getElementById(`temp-${suffix}`);
       const btnCompress = document.getElementById(`btnCompress-${suffix}`);
       const btnExpand = document.getElementById(`btnExpand-${suffix}`);
 
@@ -1787,8 +1795,8 @@ THREE.OrbitControls = OrbitControls;
       controls.target.set(0, 0, 0);
       controls.enableDamping = true;
 
-      scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-      const dir = new THREE.DirectionalLight(0xffffff, 0.90);
+      scene.add(new THREE.AmbientLight(0xffffff, 1.05));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.52);
       dir.position.set(4, 6, 5);
       scene.add(dir);
 
@@ -2038,7 +2046,7 @@ THREE.OrbitControls = OrbitControls;
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
           const tn = THREE.MathUtils.clamp(sp / V_COLOR_ABS_MAX, 0, 1);
-          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.32 + 0.28 * tn);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.40 + 0.10 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
@@ -2047,7 +2055,9 @@ THREE.OrbitControls = OrbitControls;
         inst.instanceMatrix.needsUpdate = true;
         inst.instanceColor.needsUpdate = true;
         const avgKe = keSum / N;
+        const tempK = avgKe * (T_REF_K / (1.5 * SIGMA_AT_REF * SIGMA_AT_REF));
         elKe.textContent = avgKe.toFixed(3);
+        elTempCh.textContent = tempK.toFixed(0);
         const vol = (xMax - xMin) * (2 * BOX.y) * (2 * BOX.z);
         elVol.textContent = ((vol / volAtReset) * 100).toFixed(0) + "%";
         elKeRel.textContent = (avgKe / baselineAvgKe).toFixed(2) + "×";
