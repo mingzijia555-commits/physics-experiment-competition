@@ -13,7 +13,7 @@
       background: rgba(22, 27, 34, 0.96); border-bottom: 1px solid #30363d;
       display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-size: 14px;
     }
-    #top-bar h1 { margin: 0; font-size: 18px; font-weight: 600; color: #58a6ff; width: 100%; }
+    #top-bar h1 { margin: 0; font-size: 18px; font-weight: 600; color: #ffffff; width: 100%; }
     #top-bar label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
     #top-bar input[type="range"] { width: 160px; vertical-align: middle; }
     .row-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -26,9 +26,9 @@
     .chamber-hd {
       flex: 0 0 auto; padding: 10px 14px; font-weight: 600; font-size: 16px;
       background: rgba(30, 36, 44, 0.9); border-bottom: 1px solid #30363d;
+      display: flex; align-items: center; justify-content: space-between; color: #ffffff;
     }
-    .chamber-hd.a { color: #79c0ff; }
-    .chamber-hd.b { color: #ffa657; }
+    .chamber-stats { font-size: 13px; font-weight: 400; color: #8b949e; }
     .chamber-ctl {
       flex: 0 0 auto; padding: 12px 14px; font-size: 14px; line-height: 1.6;
       border-bottom: 1px solid #21262d;
@@ -43,16 +43,17 @@
     }
     .hist-title { font-size: 13px; color: #8b949e; margin-bottom: 6px; }
     .hist-wrap canvas { width: 100%; height: 140px; display: block; background: #0d1117; border-radius: 6px; }
-    .mini-legend {
-      display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: #8b949e;
+    .mini-legend-inline {
+      display: inline-flex; align-items: center; gap: 8px; vertical-align: middle;
     }
-    .mini-legend-bar {
-      flex: 1; height: 8px; border-radius: 4px;
-      background: linear-gradient(90deg, #339af0, #ffe066, #ff6b6b);
+    .mini-legend-bar-inline {
+      display: inline-block; width: 150px; height: 10px; border-radius: 5px;
+      background: linear-gradient(90deg, #3388ff, #00ddcc, #44ee55, #ffdd33, #ff3333);
+      vertical-align: middle;
     }
     button {
       margin-top: 6px; margin-right: 8px; padding: 8px 16px; border-radius: 8px;
-      border: 1px solid #388bfd; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 14px;
+      border: 1px solid #e6edf3; background: #21262d; color: #e6edf3; cursor: pointer; font-size: 14px;
       transition: background 0.2s, transform 0.1s;
     }
     button:hover { background: #30363d; transform: translateY(-1px); }
@@ -61,7 +62,7 @@
     button.primary:hover { background: #2ea043; }
     button.danger { background: #b62324; border-color: #da3633; color: #fff; }
     button.danger:hover { background: #da3633; }
-    .stat { font-variant-numeric: tabular-nums; color: #79c0ff; font-weight: 500; }
+    .stat { font-variant-numeric: tabular-nums; color: #ffffff; font-weight: 500; }
     .hint-top { font-size: 13px; color: #8b949e; max-width: 1000px; line-height: 1.6; }
     #load-fail-msg {
       display: none; position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 99;
@@ -97,12 +98,10 @@
       <h1>分子热运动仿真：双容器隔热对比实验（麦克斯韦速率分布）</h1>
       <div class="row-inline">
         <span>热浴温度 <span id="tempVal" class="stat">300</span> K</span>
-        <input type="range" id="temp" min="80" max="900" step="5" value="300" />
+        <input type="range" id="temp" min="80" max="2000" step="5" value="300" />
       </div>
       <div class="row-inline">
-        <button type="button" class="primary" id="btnSyncInit">同步初始条件</button>
-        <button type="button" class="primary" id="btnCompressBoth">两侧同时压缩</button>
-        <button type="button" class="primary" id="btnExpandBoth">两侧同时膨胀</button>
+        <button type="button" id="btnSyncInit">同步初始条件</button>
         <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
           <input type="checkbox" id="linkPiston" />
           联动活塞
@@ -112,11 +111,19 @@
         <strong>使用方法</strong>：点击「同步初始条件」使两侧分子状态相同，再分别设置隔热/非隔热、调整活塞位置进行对比实验。
         <br><strong>物理模型</strong>：隔热时系统经历绝热过程 ⟨E<sub>k</sub>⟩ ∝ V<sup>-(γ-1)</sup>（γ=5/3）；非隔热时与热浴平衡至麦克斯韦分布。
         <br><strong>图表说明</strong>：下方 f(|v|) 图横轴为速率 |v|，纵轴为概率密度；绝热压缩后峰位右移（温度升高）。
+        <br><strong>粒子颜色与速率对照图</strong>：<span class="mini-legend-inline"><span>慢</span><span class="mini-legend-bar-inline"></span><span>快</span></span>
       </p>
     </div>
     <div id="twin">
       <section class="chamber" id="chamber-a">
-        <div class="chamber-hd a">容器 A</div>
+        <div class="chamber-hd a">
+          容器 A
+          <span class="chamber-stats">
+            容积: <span id="vol-a" class="stat">—</span> |
+            ⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span> |
+            相对初态: <span id="keRel-a" class="stat">—</span>
+          </span>
+        </div>
         <div class="chamber-ctl">
           <label class="checkbox-label"><input type="checkbox" id="insulated-a" checked /> 隔热（绝热过程）</label>
           <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
@@ -125,10 +132,6 @@
             <button type="button" class="primary" id="btnCompress-a">压缩</button>
             <button type="button" class="danger" id="btnExpand-a">膨胀</button>
           </div>
-          <div style="margin-top:10px;">容积: <span id="vol-a" class="stat">—</span></div>
-          <div>⟨E<sub>k</sub>⟩: <span id="ke-a" class="stat">—</span></div>
-          <div>相对初态: <span id="keRel-a" class="stat">—</span></div>
-          <div class="mini-legend"><span>慢</span><div class="mini-legend-bar"></div><span>快</span></div>
         </div>
         <div id="canvas-wrap-a" class="canvas-3d"></div>
         <div class="hist-wrap">
@@ -137,7 +140,14 @@
         </div>
       </section>
       <section class="chamber" id="chamber-b">
-        <div class="chamber-hd b">容器 B</div>
+        <div class="chamber-hd b">
+          容器 B
+          <span class="chamber-stats">
+            容积: <span id="vol-b" class="stat">—</span> |
+            ⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span> |
+            相对初态: <span id="keRel-b" class="stat">—</span>
+          </span>
+        </div>
         <div class="chamber-ctl">
           <label class="checkbox-label"><input type="checkbox" id="insulated-b" /> 隔热（绝热过程）</label>
           <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
@@ -146,10 +156,6 @@
             <button type="button" class="primary" id="btnCompress-b">压缩</button>
             <button type="button" class="danger" id="btnExpand-b">膨胀</button>
           </div>
-          <div style="margin-top:10px;">容积: <span id="vol-b" class="stat">—</span></div>
-          <div>⟨E<sub>k</sub>⟩: <span id="ke-b" class="stat">—</span></div>
-          <div>相对初态: <span id="keRel-b" class="stat">—</span></div>
-          <div class="mini-legend"><span>慢</span><div class="mini-legend-bar"></div><span>快</span></div>
         </div>
         <div id="canvas-wrap-b" class="canvas-3d"></div>
         <div class="hist-wrap">
@@ -1713,10 +1719,10 @@ THREE.OrbitControls = OrbitControls;
       ctx.lineTo(padL + plotW, padT + plotH);
       ctx.lineTo(padL, padT + plotH);
       ctx.closePath();
-      ctx.fillStyle = "rgba(88, 166, 255, 0.16)";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
       ctx.fill();
 
-      ctx.strokeStyle = "#484f58";
+      ctx.strokeStyle = "rgba(255,255,255,0.45)";
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.moveTo(padL, padT);
@@ -1724,7 +1730,7 @@ THREE.OrbitControls = OrbitControls;
       ctx.lineTo(padL + plotW, padT + plotH);
       ctx.stroke();
 
-      ctx.strokeStyle = "#58a6ff";
+      ctx.strokeStyle = "#ffffff";
       ctx.lineWidth = 2;
       ctx.lineJoin = "round";
       ctx.beginPath();
@@ -1785,7 +1791,7 @@ THREE.OrbitControls = OrbitControls;
       dir.position.set(4, 6, 5);
       scene.add(dir);
 
-      const boxMat = new THREE.LineBasicMaterial({ color: 0x58a6ff, transparent: true, opacity: 0.55 });
+      const boxMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 });
       function buildBoxLines(x0, x1) {
         const h = BOX.y, d = BOX.z;
         const pts = [
@@ -1803,15 +1809,8 @@ THREE.OrbitControls = OrbitControls;
       let lastRenderedXMax = xMax;
 
       const pistonGeo = new THREE.PlaneGeometry(BOX.y * 2, BOX.z * 2);
-      const pistonMat = new THREE.MeshStandardMaterial({
-        color: 0x58a6ff,
-        side: THREE.DoubleSide,
-        metalness: 0.1,
-        roughness: 0.6,
-        transparent: true,
-        opacity: 0.35,
-      });
-      const pistonMesh = new THREE.Mesh(pistonGeo, pistonMat);
+      const pistonEdges = new THREE.EdgesGeometry(pistonGeo);
+      const pistonMesh = new THREE.LineSegments(pistonEdges, boxMat);
       pistonMesh.rotation.y = Math.PI / 2;
       scene.add(pistonMesh);
 
@@ -1840,7 +1839,7 @@ THREE.OrbitControls = OrbitControls;
         const keAdMax =
           baselineAvgKe * Math.pow(volAtReset / volMin, ADIABAT_VOLUME_EXP);
         const sigAd = Math.sqrt((2 * Math.max(keAdMax, 1e-12)) / 3);
-        const sigBath = sigmaFromTempK(900);
+        const sigBath = sigmaFromTempK(2000);
         const sigEnv = Math.max(sigAd, sigBath);
         vmaxAxis = Math.max(0.55, 4.8 * sigEnv);
       }
@@ -2039,7 +2038,7 @@ THREE.OrbitControls = OrbitControls;
           keSum += 0.5 * vel[i].lengthSq();
           const sp = vel[i].length();
           const tn = THREE.MathUtils.clamp((sp - vLo) / (vHi - vLo), 0, 1);
-          colorTmp.setHSL(0.6 - tn * 0.6, 0.9, 0.3 + 0.45 * tn);
+          colorTmp.setHSL(0.65 - tn * 0.65, 1.0, 0.45 + 0.50 * tn);
           inst.setColorAt(i, colorTmp);
           dummy.position.copy(pos[i]);
           dummy.updateMatrix();
@@ -2111,8 +2110,16 @@ THREE.OrbitControls = OrbitControls;
         lastRenderedXMax = xMax;
       });
 
-      btnCompress.addEventListener("click", () => tweenOnePiston(elPiston, 12, 2400));
-      btnExpand.addEventListener("click", () => tweenOnePiston(elPiston, 100, 2400));
+      btnCompress.addEventListener("click", () => {
+        const current = Number(elPiston.value);
+        const target = Math.max(0, current - 20);
+        tweenOnePiston(elPiston, target, 1200);
+      });
+      btnExpand.addEventListener("click", () => {
+        const current = Number(elPiston.value);
+        const target = Math.min(100, current + 20);
+        tweenOnePiston(elPiston, target, 1200);
+      });
 
       return {
         suffix,
@@ -2210,26 +2217,7 @@ THREE.OrbitControls = OrbitControls;
       pistonRaf = requestAnimationFrame(stepFn);
     }
 
-    function tweenBothPistons(targetValue, duration) {
-      const start = performance.now();
-      const fromA = Number(elPistonA.value);
-      const fromB = Number(elPistonB.value);
-      const to = THREE.MathUtils.clamp(targetValue, 0, 100);
-      function stepFn(now) {
-        const u = Math.min(1, (now - start) / duration);
-        const smooth = 1 - Math.pow(1 - u, 3);
-        elPistonA.value = String(fromA + (to - fromA) * smooth);
-        elPistonB.value = String(fromB + (to - fromB) * smooth);
-        if (u < 1) pistonRaf = requestAnimationFrame(stepFn);
-        else pistonRaf = null;
-      }
-      if (pistonRaf) cancelAnimationFrame(pistonRaf);
-      pistonRaf = requestAnimationFrame(stepFn);
-    }
-
     document.getElementById("btnSyncInit").addEventListener("click", syncInitialBoth);
-    document.getElementById("btnCompressBoth").addEventListener("click", () => tweenBothPistons(12, 2400));
-    document.getElementById("btnExpandBoth").addEventListener("click", () => tweenBothPistons(100, 2400));
 
     elLinkPiston.addEventListener("change", () => {
       if (elLinkPiston.checked) {
