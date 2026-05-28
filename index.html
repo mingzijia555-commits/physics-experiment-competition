@@ -23,6 +23,7 @@
     .chamber {
       flex: 1; display: flex; flex-direction: column; min-width: 0;
       border-right: 1px solid #30363d;
+      overflow: hidden;
     }
     .chamber:last-child { border-right: none; }
     .chamber-hd {
@@ -34,23 +35,27 @@
     .chamber-stats { font-size: 14px; font-weight: 400; color: #8b949e; }
     .chamber-stats-vert {
       position: absolute; top: 10px; left: 14px; z-index: 10;
-      font-size: 15px; color: #ffffff;
-      display: flex; flex-direction: column; gap: 5px;
+      font-size: 15px; color: #8b949e;
+      display: flex; flex-direction: column; gap: 10px;
       pointer-events: none;
       text-shadow: 0 0 10px rgba(0,0,0,0.8);
     }
     .stats-sep {
-      width: 100%; height: 1px; margin: 3px 0;
-      background: rgba(255,255,255,0.22);
+      width: 100%; height: 1px; margin: 7px 0;
+      background: rgba(139,148,158,0.25);
     }
 
     .chamber-ctl {
-      flex: 0 0 auto; padding: 12px 14px; font-size: 15px; line-height: 1.7;
-      border-bottom: 1px solid #21262d;
+      display: flex; flex-direction: column; gap: 14px;
+      margin-top: 6px;
+      pointer-events: auto;
     }
-    .chamber-ctl input[type="range"] { width: 100%; height: 24px; }
+    .chamber-ctl .ctl-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .chamber-ctl input[type="range"] { width: 100px; height: 18px; }
     .chamber-ctl input:disabled { opacity: 0.45; cursor: not-allowed; }
-    .canvas-3d { flex: 1; min-height: 120px; position: relative; }
+    .canvas-3d { flex: 1; min-height: 120px; position: relative; padding: 0 10px; }
     .canvas-3d canvas { display: block; width: 100%; height: 100%; }
     .hist-wrap {
       flex: 0 0 auto; padding: 10px 12px 12px; background: #161b22;
@@ -124,11 +129,16 @@
         <div class="row-inline">
           <span>初始热浴温度 <span id="tempVal" class="stat">300</span> K</span>
           <input type="range" id="temp" min="80" max="2000" step="5" value="300" />
+          <span>面板透明度</span>
+          <input type="range" id="panelOpacity" min="15" max="100" value="100" />
         </div>
         <div class="row-inline">
           <button type="button" id="btnSyncInit">同步初始条件</button>
           <label class="checkbox-label" title="只保留左侧活塞滑块，右侧与左侧一致">
             <input type="checkbox" id="linkPiston" /> 联动活塞
+          </label>
+          <label class="checkbox-label" title="两个容器的3D视角同步">
+            <input type="checkbox" id="linkView" /> 联动视角
           </label>
         </div>
       </div>
@@ -136,15 +146,6 @@
     <div id="twin">
       <section class="chamber" id="chamber-a">
         <div class="chamber-hd a">容器 A</div>
-        <div class="chamber-ctl">
-          <label class="checkbox-label"><input type="checkbox" id="insulated-a" checked /> 隔热（绝热过程）</label>
-          <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
-          <input type="range" id="piston-a" min="0" max="100" value="100" />
-          <div style="margin-top:8px;">
-            <button type="button" class="primary" id="btnCompress-a">压缩</button>
-            <button type="button" class="danger" id="btnExpand-a">膨胀</button>
-          </div>
-        </div>
         <div id="canvas-wrap-a" class="canvas-3d">
           <div class="chamber-stats-vert">
             <div>容积: <span id="vol-a" class="stat">—</span></div>
@@ -155,6 +156,27 @@
             <div class="stats-init">初始容积: <span id="initVol-a" class="stat">—</span></div>
             <div class="stats-init">初始 T: <span id="initTemp-a" class="stat">—</span> K</div>
             <div class="stats-init">初始 ⟨E<sub>k</sub>⟩: <span id="initKe-a" class="stat">—</span></div>
+            <div class="stats-sep"></div>
+            <div class="chamber-ctl">
+              <div class="ctl-row">
+                <label class="checkbox-label"><input type="checkbox" id="insulated-a" checked /> 隔热</label>
+              </div>
+              <div class="ctl-row">
+                <span>活塞</span>
+                <input type="range" id="piston-a" min="0" max="100" value="100" />
+              </div>
+              <div class="ctl-row">
+                <span>温度</span>
+                <input type="range" id="tempLocal-a" min="80" max="2000" step="5" value="300" />
+              </div>
+              <div class="ctl-row">
+                <span id="tempLocalVal-a" class="stat">300</span> K
+              </div>
+              <div class="ctl-row">
+                <button type="button" class="primary" id="btnCompress-a">压缩</button>
+                <button type="button" class="danger" id="btnExpand-a">膨胀</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="hist-wrap">
@@ -164,15 +186,6 @@
       </section>
       <section class="chamber" id="chamber-b">
         <div class="chamber-hd b">容器 B</div>
-        <div class="chamber-ctl">
-          <label class="checkbox-label"><input type="checkbox" id="insulated-b" /> 隔热（绝热过程）</label>
-          <div style="margin-top:10px; margin-bottom:6px;">活塞位置</div>
-          <input type="range" id="piston-b" min="0" max="100" value="100" />
-          <div style="margin-top:8px;">
-            <button type="button" class="primary" id="btnCompress-b">压缩</button>
-            <button type="button" class="danger" id="btnExpand-b">膨胀</button>
-          </div>
-        </div>
         <div id="canvas-wrap-b" class="canvas-3d">
           <div class="chamber-stats-vert">
             <div>容积: <span id="vol-b" class="stat">—</span></div>
@@ -183,6 +196,27 @@
             <div class="stats-init">初始容积: <span id="initVol-b" class="stat">—</span></div>
             <div class="stats-init">初始 T: <span id="initTemp-b" class="stat">—</span> K</div>
             <div class="stats-init">初始 ⟨E<sub>k</sub>⟩: <span id="initKe-b" class="stat">—</span></div>
+            <div class="stats-sep"></div>
+            <div class="chamber-ctl">
+              <div class="ctl-row">
+                <label class="checkbox-label"><input type="checkbox" id="insulated-b" /> 隔热</label>
+              </div>
+              <div class="ctl-row">
+                <span>活塞</span>
+                <input type="range" id="piston-b" min="0" max="100" value="100" />
+              </div>
+              <div class="ctl-row">
+                <span>温度</span>
+                <input type="range" id="tempLocal-b" min="80" max="2000" step="5" value="300" />
+              </div>
+              <div class="ctl-row">
+                <span id="tempLocalVal-b" class="stat">300</span> K
+              </div>
+              <div class="ctl-row">
+                <button type="button" class="primary" id="btnCompress-b">压缩</button>
+                <button type="button" class="danger" id="btnExpand-b">膨胀</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="hist-wrap">
@@ -1707,7 +1741,7 @@ THREE.OrbitControls = OrbitControls;
         const s = vel[i].length();
         if (s > vPeak) vPeak = s;
       }
-      const vmax = Math.max(vmaxAxisFixed, vPeak * 1.04, 0.22);
+      const vmax = vmaxAxisFixed;
       const dv = vmax / bins;
 
       for (let i = 0; i < N; i++) {
@@ -1718,13 +1752,18 @@ THREE.OrbitControls = OrbitControls;
       }
 
       const density = new Float64Array(bins);
-      let fMax = 0;
+      let fMaxRaw = 0;
       for (let b = 0; b < bins; b++) {
         const f = counts[b] / (N * dv);
         density[b] = f;
-        if (f > fMax) fMax = f;
+        if (f > fMaxRaw) fMaxRaw = f;
       }
-      if (fMax < 1e-10) fMax = 1e-10;
+      if (fMaxRaw < 1e-10) fMaxRaw = 1e-10;
+      const alpha = 0.08;
+      let ema = canvas._fMaxEMA;
+      if (ema == null) { ema = fMaxRaw; canvas._fMaxEMA = ema; }
+      canvas._fMaxEMA = ema = alpha * fMaxRaw + (1 - alpha) * ema;
+      const fMax = ema;
 
       const padL = 72, padR = 14, padB = 28, padT = 20;
       const plotW = wCss - padL - padR;
@@ -1799,6 +1838,24 @@ THREE.OrbitControls = OrbitControls;
       const elInitKe = document.getElementById(`initKe-${suffix}`);
       const btnCompress = document.getElementById(`btnCompress-${suffix}`);
       const btnExpand = document.getElementById(`btnExpand-${suffix}`);
+      const elTempLocal = document.getElementById(`tempLocal-${suffix}`);
+      const elTempLocalVal = document.getElementById(`tempLocalVal-${suffix}`);
+      let localTempK = 300;
+      elTempLocal.addEventListener("input", () => {
+        localTempK = Number(elTempLocal.value);
+        elTempLocalVal.textContent = String(localTempK);
+        const sigma = sigmaFromTempK(localTempK);
+        const margin = R * 1.25;
+        for (let i = 0; i < N; i++) {
+          sampleMaxwellVelocity(vel[i], sigma);
+        }
+        let s0 = 0;
+        for (let k = 0; k < N; k++) s0 += 0.5 * vel[k].lengthSq();
+        baselineAvgKe = Math.max(s0 / N, 1e-4);
+        elInitKe.textContent = baselineAvgKe.toFixed(3);
+        elInitTemp.textContent = (baselineAvgKe * (T_REF_K / (1.5 * SIGMA_AT_REF * SIGMA_AT_REF))).toFixed(0);
+        refreshVmaxAxis();
+      });
 
       const scene = new THREE.Scene();
       scene.background = new THREE.Color(0x0d1117);
@@ -1813,6 +1870,7 @@ THREE.OrbitControls = OrbitControls;
       const controls = new OrbitControls(camera, renderer.domElement);
       controls.target.set(0, 0, 0);
       controls.enableDamping = true;
+      controls.addEventListener("start", () => { window._lastViewSource = suffix; });
 
       scene.add(new THREE.AmbientLight(0xffffff, 1.05));
       const dir = new THREE.DirectionalLight(0xffffff, 0.52);
@@ -2107,7 +2165,7 @@ THREE.OrbitControls = OrbitControls;
       }
 
       function randomizeOnly() {
-        const Tk = readTempK();
+        const Tk = localTempK;
         const sigma = sigmaFromTempK(Tk);
         readPistonFromUI();
         const margin = R * 1.25;
@@ -2155,6 +2213,8 @@ THREE.OrbitControls = OrbitControls;
         wrap,
         elPiston,
         elInsulated,
+        camera,
+        controls,
         pos,
         vel,
         readPistonFromUI,
@@ -2180,6 +2240,14 @@ THREE.OrbitControls = OrbitControls;
     const chB = createChamber("b");
 
     document.getElementById("insulated-b").checked = false;
+
+    const panelA = document.querySelector("#canvas-wrap-a .chamber-stats-vert");
+    const panelB = document.querySelector("#canvas-wrap-b .chamber-stats-vert");
+    document.getElementById("panelOpacity").addEventListener("input", function () {
+      const v = parseFloat(this.value) / 100;
+      panelA.style.opacity = v;
+      panelB.style.opacity = v;
+    });
 
     var loadFail = document.getElementById("load-fail-msg");
     if (loadFail) loadFail.style.display = "none";
@@ -2216,6 +2284,10 @@ THREE.OrbitControls = OrbitControls;
       chA.setBaseline(vol0, bke);
       chB.setBaseline(vol0, bke);
       if (elTempVal) elTempVal.textContent = String(Math.round(Tk));
+      document.getElementById("tempLocal-a").value = String(Math.round(Tk));
+      document.getElementById("tempLocal-b").value = String(Math.round(Tk));
+      document.getElementById("tempLocalVal-a").textContent = String(Math.round(Tk));
+      document.getElementById("tempLocalVal-b").textContent = String(Math.round(Tk));
     }
 
     function applyTemperatureBoth() {
@@ -2252,17 +2324,21 @@ THREE.OrbitControls = OrbitControls;
 
     document.getElementById("btnSyncInit").addEventListener("click", syncInitialBoth);
 
+    let pistonSyncGuard = false;
     elLinkPiston.addEventListener("change", () => {
       if (elLinkPiston.checked) {
         elPistonB.value = elPistonA.value;
-        elPistonB.disabled = true;
-      } else {
-        elPistonB.disabled = false;
       }
     });
-    elPistonA.addEventListener("input", () => {
-      if (elLinkPiston.checked) elPistonB.value = elPistonA.value;
-    });
+    function syncPiston(src, dst) {
+      if (!elLinkPiston.checked || pistonSyncGuard) return;
+      pistonSyncGuard = true;
+      dst.value = src.value;
+      dst.dispatchEvent(new Event("input", { bubbles: true }));
+      pistonSyncGuard = false;
+    }
+    elPistonA.addEventListener("input", () => syncPiston(elPistonA, elPistonB));
+    elPistonB.addEventListener("input", () => syncPiston(elPistonB, elPistonA));
 
     syncInitialBoth();
 
@@ -2273,17 +2349,23 @@ THREE.OrbitControls = OrbitControls;
     window.addEventListener("resize", onResize);
     onResize();
 
+    const elLinkView = document.getElementById("linkView");
+
     const clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
       const dt = Math.min(clock.getDelta(), 0.05);
-      if (elLinkPiston.checked) {
-        chB.elPiston.value = chA.elPiston.value;
-      }
       chA.step(dt);
       chB.step(dt);
       chA.renderFrame();
       chB.renderFrame();
+      if (elLinkView.checked && window._lastViewSource) {
+        const src = window._lastViewSource === "a" ? chA : chB;
+        const dst = window._lastViewSource === "a" ? chB : chA;
+        dst.controls.target.copy(src.controls.target);
+        dst.camera.position.copy(src.camera.position);
+        dst.camera.quaternion.copy(src.camera.quaternion);
+      }
     }
     animate();
   </script>
